@@ -16,7 +16,7 @@
 <body>
 <div style="background:#fbf1ee;min-height:100vh">
 
-  <header style="position:sticky;top:0;z-index:20;background:rgba(251,241,238,0.92);backdrop-filter:blur(6px);border-bottom:1px solid rgba(32,31,29,0.16)">
+  <header id="siteHeader" style="position:sticky;top:0;z-index:20;background:rgba(251,241,238,0.92);backdrop-filter:blur(6px);border-bottom:1px solid rgba(32,31,29,0.16);transition:transform 0.25s ease">
     <div style="max-width:1180px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
       <div style="font-family:'Zen Old Mincho',serif;font-weight:600;font-size:22px;letter-spacing:0.01em">岡田音楽教室</div>
       <nav style="display:flex;gap:22px;flex-wrap:wrap;font-size:14px">
@@ -230,5 +230,20 @@
   </footer>
 
 </div>
+<script>
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.addEventListener('load', () => window.scrollTo(0, 0));
+  (function () {
+    var lastY = 0;
+    window.addEventListener('scroll', function () {
+      var header = document.getElementById('siteHeader');
+      if (!header) return;
+      var y = window.scrollY;
+      if (y > lastY && y > 80) header.style.transform = 'translateY(-100%)';
+      else header.style.transform = 'translateY(0)';
+      lastY = y;
+    }, { passive: true });
+  })();
+</script>
 </body>
 </html>
