@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ブログ | 岡田音楽教室</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;500;600;700;900&family=Noto+Serif+JP:wght@400;500;600&display=swap">
+<style>
+  body{margin:0;background:#fbf1ee;color:#201f1d;font-family:"Noto Serif JP",serif}
+  a{color:#7d5411;text-underline-offset:3px}
+  a:hover{color:#b68235}
+  ::selection{background:rgba(182,130,53,0.28)}
+  .plate{filter:sepia(0.22) saturate(0.82) contrast(1.05);box-sizing:border-box;border:6px solid #f3e2dd;outline:1px solid rgba(182,130,53,0.2);display:block;width:100%;height:100%;object-fit:cover}
+  .post-card{text-decoration:none;color:inherit;display:block;border:1px solid rgba(32,31,29,0.16);background:#fffdfc;transition:transform .2s ease, box-shadow .2s ease}
+  .post-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(32,31,29,0.1)}
+</style>
+</head>
+<body>
+<div style="background:#fbf1ee;min-height:100vh">
+
+  <header id="siteHeader" style="position:sticky;top:0;z-index:20;background:rgba(251,241,238,0.92);backdrop-filter:blur(6px);border-bottom:1px solid rgba(32,31,29,0.16)">
+    <div style="max-width:1180px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <a href="index.html" style="font-family:'Zen Old Mincho',serif;font-weight:600;font-size:22px;letter-spacing:0.01em;text-decoration:none;color:#201f1d">岡田音楽教室</a>
+      <nav style="display:flex;gap:22px;flex-wrap:wrap;font-size:14px">
+        <a href="index.html#credo" style="text-decoration:none;color:#201f1d">教室理念</a>
+        <a href="index.html#profile" style="text-decoration:none;color:#201f1d">プロフィール</a>
+        <a href="index.html#course" style="text-decoration:none;color:#201f1d">コース・料金</a>
+        <a href="index.html#concours" style="text-decoration:none;color:#201f1d">コンクール・進学実績</a>
+        <a href="blog.html" style="text-decoration:none;color:#b68235;font-weight:600">ブログ</a>
+        <a href="index.html#contact" style="text-decoration:none;color:#201f1d">お問い合わせ</a>
+      </nav>
+    </div>
+  </header>
+
+  <section style="max-width:1180px;margin:0 auto;padding:clamp(32px,6vw,56px) 24px;text-align:center">
+    <h1 style="font-family:'Zen Old Mincho',serif;font-weight:600;font-size:clamp(26px,4vw,38px);line-height:1.3;margin:0 0 12px">ブログ</h1>
+    <p style="font-size:15px;line-height:1.8;margin:0 auto;max-width:56ch;color:#4a453f">教室からのお知らせや、レッスンの様子をお伝えします。</p>
+  </section>
+
+  <section style="max-width:1180px;margin:0 auto;padding:0 24px 80px">
+    <div id="blogGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px">
+      <p style="grid-column:1/-1;text-align:center;color:#4a453f">読み込み中…</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // ============================================================
+  // 【サイト管理者へ】Bloggerでブログを作成したら、
+  // 下の BLOG_URL を実際のブログのURLに書き換えてください。
+  // 例: const BLOG_URL = "https://okada-piano-blog.blogspot.com";
+  // 末尾に / は付けないでください。
+  // ============================================================
+  const BLOG_URL = "https://REPLACE-WITH-YOUR-BLOG.blogspot.com";
+
+  function loadPosts(){
+    const s = document.createElement('script');
+    s.src = BLOG_URL + '/feeds/posts/default?alt=json-in-script&max-results=12&callback=renderBloggerPosts';
+    s.onerror = function(){
+      document.getElementById('blogGrid').innerHTML =
+        '<p style="grid-column:1/-1;text-align:center;color:#4a453f">ブログを読み込めませんでした。blog.html内のBLOG_URLの設定をご確認ください。</p>';
+    };
+    document.body.appendChild(s);
+  }
+
+  function renderBloggerPosts(data){
+    const grid = document.getElementById('blogGrid');
+    const entries = (data.feed && data.feed.entry) || [];
+    if(!entries.length){
+      grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#4a453f">まだ投稿がありません。</p>';
+      return;
+    }
+    grid.innerHTML = entries.map(function(e){
+      const title = e.title.$t;
+      let link = '#';
+      for (let i=0;i<e.link.length;i++){ if(e.link[i].rel==='alternate'){ link = e.link[i].href; break; } }
+      const published = new Date(e.published.$t);
+      const dateStr = published.getFullYear() + '.' + String(published.getMonth()+1).padStart(2,'0') + '.' + String(published.getDate()).padStart(2,'0');
+      let img = '';
+      if (e.media$thumbnail && e.media$thumbnail.url) {
+        img = e.media$thumbnail.url.replace(/\/s72-c\//, '/s600/');
+      }
+      let summary = e.summary ? e.summary.$t.replace(/<[^>]+>/g,'') : '';
+      if (summary.length > 90) summary = summary.slice(0,90) + '…';
+      const imgHtml = img
+        ? '<div class="plate" style="aspect-ratio:4/3;"><img src="'+img+'" style="width:100%;height:100%;object-fit:cover" alt=""></div>'
+        : '';
+      return '<a class="post-card" href="'+link+'" target="_blank" rel="noopener">'
+        + imgHtml
+        + '<div style="padding:20px">'
+        + '<div style="font-family:\'Zen Old Mincho\',serif;color:#b68235;font-size:13px;margin-bottom:8px">'+dateStr+'</div>'
+        + '<h3 style="font-family:\'Zen Old Mincho\',serif;font-weight:600;font-size:17px;line-height:1.6;margin:0 0 10px">'+title+'</h3>'
+        + '<p style="font-size:14px;line-height:1.7;color:#4a453f;margin:0">'+summary+'</p>'
+        + '</div></a>';
+    }).join('');
+  }
+
+  loadPosts();
+</script>
+
+</body>
+</html>
